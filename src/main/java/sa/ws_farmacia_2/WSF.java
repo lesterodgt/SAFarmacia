@@ -26,6 +26,7 @@ public class WSF {
      * This is a sample web service operation
      */
     final String bd = "jdbc:mysql://35.196.79.167:3306/farmacia";
+    //final String bd = "jdbc:mysql://35.185.46.128:3306/farmacia";
     
     @WebMethod(operationName = "IngresoMedicamentoF2")
     public int ingresoMedicamentoF2(@WebParam(name = "Medicamentos") String json) {
@@ -50,8 +51,12 @@ public class WSF {
                         +""+medicamento.getString("existencias")+","
                         +""+medicamento.getString("bajo_prescripcion")+""
                         + ")";
-                PreparedStatement ps = con.prepareStatement(query);
-                ps.execute();
+                try{
+                    PreparedStatement ps = con.prepareStatement(query);
+                    ps.execute();
+                }catch(Exception ex){
+                    System.out.println(ex.toString());
+                }
                 
             }
             con.close(); 
