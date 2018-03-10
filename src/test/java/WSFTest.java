@@ -54,7 +54,7 @@ public class WSFTest {
     public void IngresoMedicamento(){
         WSF webService = new WSF();
         int result = webService.ingresoMedicamentoF2("{medicamento:[]}");
-        assertEquals(result,4);
+        assertEquals(result,0);
     }
     
     @Test
