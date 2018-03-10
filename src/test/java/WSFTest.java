@@ -16,9 +16,9 @@ import sa.ws_farmacia_2.WSF;
  *
  * @author scxal
  */
-public class PruebasUnitarias {
+public class WSFTest {
     
-    public PruebasUnitarias() {
+    public WSFTest() {
     }
     
     @BeforeClass
