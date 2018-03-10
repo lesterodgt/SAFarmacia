@@ -54,7 +54,7 @@ public class PruebasUnitarias {
     public void IngresoMedicamento(){
         WSF webService = new WSF();
         int result = webService.ingresoMedicamentoF2("{medicamento:[]}");
-        assertEquals(result,0);
+        assertEquals(result,09);
     }
     
     @Test
