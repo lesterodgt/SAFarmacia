@@ -47,7 +47,7 @@ public class WSFTest {
     public void IngresoDespacho(){
         WSF webService = new WSF();
         int result = webService.IngresoDespachoF2("{despacho:[]}");
-        assertEquals(result,0);
+       assertEquals(result,0);
     }
     
     @Test
