@@ -10,10 +10,13 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import javax.jws.WebService;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import org.json.*;
+import java.util.Date;
 
 /**
  *
@@ -25,7 +28,7 @@ public class WSF {
     /**
      * This is a sample web service operation
      */
-    final String bd = "jdbc:mysql://35.196.79.167:3306/farmacia";
+    final String bd = "jdbc:mysql://sql9.freemysqlhosting.net:3306/sql9232149";
     //final String bd = "jdbc:mysql://35.185.46.128:3306/farmacia";
     
     @WebMethod(operationName = "IngresoMedicamentoF2")
@@ -140,6 +143,123 @@ public class WSF {
             }catch(Exception e){ 
                 System.out.println(e);
                 return 0;
+            }
+    }
+    
+    /**
+     * Web service operation
+     */
+    @WebMethod(operationName = "DespachoReceta")
+    public String DespachoReceta(@WebParam(name = "Receta") String Receta) {
+        //TODO write your implementation code here:
+        try{  
+            Class.forName("com.mysql.jdbc.Driver");  
+            JSONObject ent = new JSONObject(Receta);
+            Connection con=DriverManager.getConnection(  
+            bd,"sql9232149","H79lXDv9hX");  
+            Statement stmt=con.createStatement();
+            org.json.simple.JSONArray despachos = new org.json.simple.JSONArray();
+            org.json.simple.JSONArray medicamentos = new org.json.simple.JSONArray();
+            ResultSet resultSet = stmt.executeQuery("select * from DESPACHO,DETALLE_DESPACHO,MEDICAMENTO where DESPACHO.idDESPACHO=DETALLE_DESPACHO.DESPACHO and DETALLE_DESPACHO.MEDICAMENTO=MEDICAMENTO.idMEDICAMENTO and DESPACHO.Receta="+ent.getString("Receta"));
+            int i = 0;
+            JSONObject despacho = new JSONObject();
+            while(resultSet.next()){
+                if(i==0){
+                    despacho.put("Receta",resultSet.getString("Receta"));
+                    despacho.put("Nombre",resultSet.getString("DESPACHO.Nombres"));
+                    despacho.put("DPI",resultSet.getString("DPI"));
+                    despacho.put("Fecha","null");
+                    despachos.add(despacho);
+                    i++;
+                }
+                JSONObject medicamento = new JSONObject();
+                medicamento.put("cantidad",resultSet.getString("Cantidad"));
+                medicamento.put("medicamento",resultSet.getString("MEDICAMENTO.Nombre"));
+                medicamentos.add(medicamento);
+            }
+            despacho.put("Medicamentos",medicamentos);
+            JSONObject obj = new JSONObject();
+            obj.put("Despachos",despachos);
+            return obj.toString();
+            }catch(Exception e){ 
+                System.out.println(e);
+                return "{}";
+            }
+    }
+
+    /**
+     * Web service operation
+     */
+    @WebMethod(operationName = "TrasladoMedicamento")
+    public String TrasladoMedicamento(@WebParam(name = "informacion_medicamento") String informacion_medicamento) {
+        //TODO write your implementation code here:
+        JSONObject obj = new JSONObject(informacion_medicamento);
+        try{  
+            Class.forName("com.mysql.jdbc.Driver");  
+            Connection con=DriverManager.getConnection(  
+            bd,"sql9232149","H79lXDv9hX");  
+            Statement stmt=con.createStatement();
+                String query = "";
+                String query1 = "";
+                JSONArray medicamentos = obj.getJSONArray("Medicamentos");
+                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                Date date = new Date();
+                for(int i = 0; i < medicamentos.length();i++){
+                    JSONObject medicamento = (JSONObject)medicamentos.get(i);
+                    query += "insert into TRASLADO_MEDICAMENTO (FECHA,CODIGO,Origen,Destino,Cantidad)values("
+                        +"STR_TO_DATE('"+dateFormat.format(date)+"', '%d/%m/%Y'),"
+                        +medicamento.getString("Codigo")+","
+                        +obj.getString("Origen")+","
+                        +obj.getString("Destino")+","
+                        +medicamento.getString("Cantidad")+");\n";
+                    if(obj.getString("Destino").equals("2")){
+                        query1 += "update MEDICAMENTO set Existencias=Existencias+"+medicamento.getString("Cantidad")+" where Codigo="+medicamento.getString("Codigo")+";";
+                    }else{
+                        query1 += "update MEDICAMENTO set Existencias=Existencias-"+medicamento.getString("Cantidad")+" where Codigo="+medicamento.getString("Codigo")+";";
+                    }
+                }
+                try{
+                    PreparedStatement ps = con.prepareStatement(query);
+                    ps.execute();
+                    PreparedStatement ps1 = con.prepareStatement(query1);
+                    ps1.execute();
+                }catch(Exception ex){
+                    System.out.println(ex.toString());
+                }
+            con.close(); 
+            }catch(Exception e){ 
+                System.out.println(e);
+                return "{ \"Exito\":\"0\",\"Error\":\""+e.toString()+"\"}";
+            }
+        return "{ \"Exito\":\"1\",\"Error\":\"\"}";
+    }
+
+    /**
+     * Web service operation
+     */
+    @WebMethod(operationName = "ConsultarExistencias")
+    public String ConsultarExistencias(@WebParam(name = "Codigo") String Codigo) {
+        //TODO write your implementation code here:
+        try{  
+            JSONObject obj = new JSONObject(Codigo);
+            System.out.println(obj.toString());
+            String result="";
+            Class.forName("com.mysql.jdbc.Driver");  
+            Connection con=DriverManager.getConnection(  
+            bd,"sql9232149","H79lXDv9hX");  
+            Statement stmt=con.createStatement();
+            ResultSet resultSet = stmt.executeQuery("select * from MEDICAMENTO where codigo="+obj.getString("Codigo")+";");
+            if(!resultSet.next()){
+                con.close();
+                result= "{\"Cantidad\":\"0\"}";
+            }else{
+                result= "{\"Cantidad\":\""+resultSet.getString("Existencias")+"\"}";
+                con.close();
+            }
+            return result;
+            }catch(Exception e){ 
+                System.out.println(e);
+                return "{\"Cantidad\":\"0\"}";
             }
     }
 }
