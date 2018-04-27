@@ -39,7 +39,7 @@ public class WSF {
         try{  
             Class.forName("com.mysql.jdbc.Driver");  
             Connection con=DriverManager.getConnection(  
-            bd,"root","grupo2sa");  
+            bd,"sql9232149","H79lXDv9hX");  
             Statement stmt=con.createStatement();
             for(int a = 0; a < medicamentos.length();a++){
                 JSONObject medicamento = (JSONObject)medicamentos.get(a);
@@ -81,7 +81,7 @@ public class WSF {
         try{  
             Class.forName("com.mysql.jdbc.Driver");  
             Connection con=DriverManager.getConnection(  
-            bd,"root","grupo2sa");  
+            bd,"sql9232149","H79lXDv9hX");  
             Statement stmt=con.createStatement();
             for(int a = 0; a < despachos.length();a++){
                 JSONObject despacho = (JSONObject)despachos.get(a);
@@ -130,7 +130,7 @@ public class WSF {
         try{  
             Class.forName("com.mysql.jdbc.Driver");  
             Connection con=DriverManager.getConnection(  
-            bd,"root","grupo2sa");  
+            bd,"sql9232149","H79lXDv9hX");  
             Statement stmt=con.createStatement();
             ResultSet resultSet = stmt.executeQuery("select * from MEDICAMENTO where codigo="+Medicamento+";");
             if(!resultSet.next()){
