@@ -263,4 +263,43 @@ public class WSF {
                 return "{\"Cantidad\":\"0\"}";
             }
     }
+    /**
+     * Web service operation
+     */
+    @WebMethod(operationName = "ReporteTraslados")
+    public String ReporteTraslados() {
+        try{  
+            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+            Date date = new Date();
+            //return "alguna estupidez";
+            System.out.println(dateFormat.format(date));
+            Class.forName("com.mysql.jdbc.Driver");  
+            Connection con=DriverManager.getConnection(  
+            bd,"sql9232149","H79lXDv9hX");  
+            Statement stmt=con.createStatement();
+            Statement stmt1=con.createStatement();
+            ResultSet resultSet1 = stmt.executeQuery("select * from TRASLADO_MEDICAMENTO,MEDICAMENTO where TRASLADO_MEDICAMENTO.Codigo=MEDICAMENTO.Codigo;");
+            Date date1 = new Date();
+            System.out.println(dateFormat.format(date1));
+            org.json.simple.JSONArray traslados = new org.json.simple.JSONArray();
+            JSONObject obj = new JSONObject();
+            while(resultSet1.next()){
+                JSONObject traslado = new JSONObject();
+                traslado.put("id",resultSet1.getString("idTRASLADO_MEDICAMENTO"));
+                traslado.put("medicamento",resultSet1.getString("Nombre"));
+                traslado.put("origen",resultSet1.getString("Origen"));
+                traslado.put("destino",resultSet1.getString("Destino"));
+                traslado.put("fecha",resultSet1.getString("Fecha"));
+                traslado.put("cantidad",resultSet1.getString("Cantidad"));
+                traslados.add(traslado);
+            }
+            obj.put("traslados", traslados);
+            System.out.println(obj.toString());
+            con.close();
+            return obj.toString();
+            }catch(Exception e){ 
+                System.out.println(e);
+                return "{\"Error:\":\""+e.toString()+"\",\"Exito\":\"0\"}";
+            }
+    }
 }
