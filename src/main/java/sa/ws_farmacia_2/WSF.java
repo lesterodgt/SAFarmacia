@@ -180,6 +180,7 @@ public class WSF {
             despacho.put("Medicamentos",medicamentos);
             JSONObject obj = new JSONObject();
             obj.put("Despachos",despachos);
+            con.close();
             return obj.toString();
             }catch(Exception e){ 
                 System.out.println(e);
